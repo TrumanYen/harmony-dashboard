@@ -16,6 +16,7 @@ grpcio==1.76.0
 h5py==3.15.1
 idna==3.11
 importlib_resources==6.5.2
+iniconfig==2.3.0
 joblib==1.5.3
 keras==2.15.0
 lazy_loader==0.4
@@ -34,12 +35,15 @@ oauthlib==3.3.1
 opt_einsum==3.4.0
 packaging==25.0
 platformdirs==4.5.1
+pluggy==1.6.0
 pooch==1.8.2
 pretty_midi==0.2.11
 protobuf==4.25.8
 pyasn1==0.6.1
 pyasn1_modules==0.4.2
 pycparser==2.23
+Pygments==2.19.2
+pytest==9.0.2
 requests==2.32.5
 requests-oauthlib==2.0.0
 resampy==0.4.2
