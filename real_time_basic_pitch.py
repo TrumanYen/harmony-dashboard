@@ -1,5 +1,4 @@
 import queue
-from abc import ABC, abstractmethod
 import threading
 import time
 import sys
@@ -11,16 +10,17 @@ import numpy as np
 import soundfile as sf
 import sounddevice as sd
 
+from chord_predictor import I_PitchStreamer, I_PitchStreamListener
 
-class I_PitchStreamListener(ABC):
-    @abstractmethod
+
+class DummyListener(I_PitchStreamListener):
     def new_pitches_detected(self, pitches: list[int]):
         pass
 
 
-class PitchDetectingAudioStreamer:
-    def __init__(self, listener: I_PitchStreamListener):
-        self.listener = listener
+class PitchDetectingAudioStreamer(I_PitchStreamer):
+    def __init__(self):
+        self.listener = DummyListener()
         self.audio_block_queue = queue.Queue()
         self.thread_event = threading.Event()
         self.pitch_detection_thread = threading.Thread(
@@ -38,7 +38,8 @@ class PitchDetectingAudioStreamer:
         self.min_freq_hz = 27.5
         self.max_freq_hz = 2093.0
 
-    def start_streaming(self):
+    def start_streaming(self, stream_listener: I_PitchStreamListener):
+        self.listener = stream_listener
         self.pitch_detection_thread.start()
         self.audio_streaming_thread.start()
 
