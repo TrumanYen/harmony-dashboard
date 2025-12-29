@@ -11,6 +11,9 @@ class I_PitchStreamListener(ABC):
 
     @abstractmethod
     def new_pitches_detected(self, pitches: list[int]):
+        """
+        pitches in midi numbers
+        """
         pass
 
 
@@ -77,8 +80,8 @@ class ChordPredictor:
         self.harmony_analyzer = harmony_analyzer
         self.presenter = presenter
 
-        self.harmony_analyzer.register_listener(self.presenter)
         self.pitch_streamer.register_listener(self.harmony_analyzer)
+        self.harmony_analyzer.register_listener(self.presenter)
 
     def run(self):
         self.pitch_streamer.start_streaming()
