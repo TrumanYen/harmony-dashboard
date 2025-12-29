@@ -1,4 +1,4 @@
-from chord_predictor import I_HarmonyAnalyzer, I_HarmonyStateListener
+from app import I_HarmonyAnalyzer, I_HarmonyStateListener
 from harmony_domain import NoteName, Note, ChordType, Chord, HarmonyState
 from chord_analyzer import ChordAnalyzer
 from scale_analyzer import ScaleAnalyzer

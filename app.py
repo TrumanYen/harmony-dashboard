@@ -68,8 +68,7 @@ class I_HarmonyPresenter(I_HarmonyStateListener):
         pass
 
 
-# Orchestrator
-class ChordPredictor:
+class App:
     def __init__(
         self,
         pitch_streamer: I_PitchStreamer,

@@ -10,7 +10,7 @@ import numpy as np
 import soundfile as sf
 import sounddevice as sd
 
-from chord_predictor import I_PitchStreamer, I_PitchStreamListener
+from app import I_PitchStreamer, I_PitchStreamListener
 
 
 class DummyListener(I_PitchStreamListener):

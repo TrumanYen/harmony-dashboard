@@ -4,7 +4,7 @@ from unittest.mock import Mock
 import random
 
 from harmony_domain import NoteName, Note, ChordType, Chord, HarmonyState
-from chord_predictor import I_HarmonyStateListener
+from app import I_HarmonyStateListener
 from harmony_analyzer import HarmonyAnalyzer
 
 

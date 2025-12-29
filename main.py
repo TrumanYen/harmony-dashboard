@@ -1,4 +1,4 @@
-from chord_predictor import ChordPredictor, I_HarmonyPresenter
+from app import App, I_HarmonyPresenter
 from harmony_domain import HarmonyState
 from real_time_basic_pitch import PitchDetectingAudioStreamer
 from harmony_analyzer import HarmonyAnalyzer
@@ -23,10 +23,10 @@ if __name__ == "__main__":
     harmony_analyzer = HarmonyAnalyzer()
     presenter = DummyHarmonyPresenter()  # TODO: use a real presenter
 
-    chord_predictor = ChordPredictor(
+    app = App(
         pitch_streamer=pitch_detecting_audio_streamer,
         harmony_analyzer=harmony_analyzer,
         presenter=presenter,
     )
 
-    chord_predictor.run()
+    app.run()
