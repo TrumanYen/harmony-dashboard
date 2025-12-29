@@ -38,8 +38,10 @@ class PitchDetectingAudioStreamer(I_PitchStreamer):
         self.min_freq_hz = 27.5
         self.max_freq_hz = 2093.0
 
-    def start_streaming(self, stream_listener: I_PitchStreamListener):
+    def register_listener(self, stream_listener: I_PitchStreamListener):
         self.listener = stream_listener
+
+    def start_streaming(self):
         self.pitch_detection_thread.start()
         self.audio_streaming_thread.start()
 
