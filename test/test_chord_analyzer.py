@@ -1,10 +1,9 @@
 import pytest
 import pretty_midi
 import random
-import time
 
-from harmony_domain import NoteName, Note, ChordType
-from harmony_analyzer import ScaleAgnosticChord, ChordAnalyzer
+from harmony_domain import NoteName, Note, ChordType, ScaleAgnosticChord
+from chord_analyzer import ChordAnalyzer
 
 
 def pitch_at_random_octave(note_name: str):

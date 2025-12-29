@@ -54,3 +54,16 @@ class HarmonyState:
 
     current_chord: Chord | None
     notes_detected: list[Note] | None
+
+
+@dataclass
+class ScaleAgnosticChord:
+    """
+    Chord agnostic of enharmonic equivalents or octave.
+    For example, a major chord with a root of B2 and a major chord
+    with a root of Cb4 would both have 'root_wrapped_pitch'=2
+    and 'chord_type'=ChordType.MAJOR
+    """
+
+    root_wrapped_pitch: int
+    chord_type: ChordType
