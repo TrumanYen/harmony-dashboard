@@ -35,7 +35,7 @@ class ScaleAnalyzer:
         return self.DEFAULT_WRAPPED_PITCH_TO_NOTE_MAPPING[wrapped_pitch]
 
 
-class I_ConvolutionalScaleDetector(ABC):
+class I_ConvolutionalTonalCenterDetector(ABC):
     @abstractmethod
     def insert_chord(self, chord: ScaleAgnosticChord):
         pass
@@ -49,13 +49,15 @@ class I_ConvolutionalScaleDetector(ABC):
         pass
 
 
-class SlidingWindowScaleDetector:
+class SlidingWindowTonalCenterDetector:
     """
-    Uses the ConvolutionalScaleDetector under the hood, but manages a sliding window
-    of chords to feed into the ConvolutionalScaleDetector
+    Uses the ConvolutionalTonalCenterDetector under the hood, but manages a sliding window
+    of chords to feed into the ConvolutionalTonalCenterDetector
     """
 
-    def __init__(self, convolutional_scale_detector: I_ConvolutionalScaleDetector):
+    def __init__(
+        self, convolutional_scale_detector: I_ConvolutionalTonalCenterDetector
+    ):
         self.SLIDING_WINDOW_SIZE = 10
         self.convolutional_scale_detector = convolutional_scale_detector
         self.fifo_chord_window = deque()
@@ -76,7 +78,7 @@ class SlidingWindowScaleDetector:
         )
 
 
-class ConvolutionalScaleDetector(I_ConvolutionalScaleDetector):
+class ConvolutionalTonalCenterDetector(I_ConvolutionalTonalCenterDetector):
     """
     jist of the algorithm:
     - represent recently detected chords in a 2d array where rows are the chord type

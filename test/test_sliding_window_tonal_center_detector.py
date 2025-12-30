@@ -4,23 +4,30 @@ import random
 
 
 from harmony_domain import ScaleAgnosticChord, ChordType
-from scale_analyzer import I_ConvolutionalScaleDetector, SlidingWindowScaleDetector
+from tonal_center_detector import (
+    I_ConvolutionalTonalCenterDetector,
+    SlidingWindowTonalCenterDetector,
+)
 
 
-class TestSlidingWindowScaleDetector:
+class TestSlidingWindowTonalCenterDetector:
     EXPECTED_SLIDING_WINDOW_SIZE = 10
 
     @pytest.fixture(autouse=True)
     def before_each_test(self):
-        self.convolutional_scale_detector = Mock(spec=I_ConvolutionalScaleDetector)
-        self.patient = SlidingWindowScaleDetector(self.convolutional_scale_detector)
+        self.convolutional_tonal_center_detector = Mock(
+            spec=I_ConvolutionalTonalCenterDetector
+        )
+        self.patient = SlidingWindowTonalCenterDetector(
+            self.convolutional_tonal_center_detector
+        )
 
     def test_will_fill_sliding_window_with_unique_chords(self):
         for i in range(self.EXPECTED_SLIDING_WINDOW_SIZE):
             chord = ScaleAgnosticChord(i % 12, ChordType.MAJOR)
             self.patient.recalculate_tonal_center_given_new_chord(chord)
         assert (
-            self.convolutional_scale_detector.insert_chord.call_count
+            self.convolutional_tonal_center_detector.insert_chord.call_count
             == self.EXPECTED_SLIDING_WINDOW_SIZE
         )
 
@@ -31,12 +38,12 @@ class TestSlidingWindowScaleDetector:
             chord = ScaleAgnosticChord(i % 12, ChordType.MAJOR)
             self.patient.recalculate_tonal_center_given_new_chord(chord)
 
-        self.convolutional_scale_detector.remove_chord.assert_called_once_with(
+        self.convolutional_tonal_center_detector.remove_chord.assert_called_once_with(
             expected_oldest_chord
         )
 
         assert (
-            self.convolutional_scale_detector.insert_chord.call_count
+            self.convolutional_tonal_center_detector.insert_chord.call_count
             == self.EXPECTED_SLIDING_WINDOW_SIZE + 1
         )
 
@@ -46,18 +53,18 @@ class TestSlidingWindowScaleDetector:
 
         self.patient.recalculate_tonal_center_given_new_chord(arbitrary_chord)
 
-        self.convolutional_scale_detector.insert_chord.assert_called_once()
+        self.convolutional_tonal_center_detector.insert_chord.assert_called_once()
 
-    def test_will_recalculate_convolutional_scale_detector_every_new_chord(self):
+    def test_will_recalculate_convolutional_tonal_center_detector_every_new_chord(self):
         arbitrary_chord = ScaleAgnosticChord(0, ChordType.MAJOR)
 
         self.patient.recalculate_tonal_center_given_new_chord(arbitrary_chord)
 
-        self.convolutional_scale_detector.predict_tonal_center.assert_called_once()
+        self.convolutional_tonal_center_detector.predict_tonal_center.assert_called_once()
 
     def test_will_provide_correct_current_tonal_center(self):
         expected_tonal_center = random.randint(0, 11)
-        self.convolutional_scale_detector.predict_tonal_center.return_value = (
+        self.convolutional_tonal_center_detector.predict_tonal_center.return_value = (
             expected_tonal_center
         )
         arbitrary_chord = ScaleAgnosticChord(0, ChordType.MAJOR)

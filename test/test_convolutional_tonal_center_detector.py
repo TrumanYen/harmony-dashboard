@@ -1,13 +1,13 @@
 import pytest
 
 from harmony_domain import ScaleAgnosticChord, ChordType
-from scale_analyzer import ConvolutionalScaleDetector
+from tonal_center_detector import ConvolutionalTonalCenterDetector
 
 
-class TestConvolutionalScaleDetector:
+class TestConvolutionalTonalCenterDetector:
     @pytest.fixture(autouse=True)
     def before_each_test(self):
-        self.patient = ConvolutionalScaleDetector()
+        self.patient = ConvolutionalTonalCenterDetector()
 
     def test_can_predict_obviously_c_major_progression(self):
         chord_progression = self.very_obviously_c_major_progression()

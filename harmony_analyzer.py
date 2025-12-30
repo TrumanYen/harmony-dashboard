@@ -1,7 +1,7 @@
 from app import I_HarmonyAnalyzer, I_HarmonyStateListener
 from harmony_domain import NoteName, Note, ChordType, Chord, HarmonyState
 from chord_analyzer import ChordAnalyzer
-from scale_analyzer import ScaleAnalyzer
+from tonal_center_detector import ScaleAnalyzer
 
 """
 NOTE: "Wrapped pitches" here refers to semitones from A, zero-indexed, wrapped between 0-11 incl.
