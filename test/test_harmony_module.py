@@ -5,7 +5,7 @@ import random
 
 from harmony_domain import NoteName, Note, ChordType, Chord, HarmonyState
 from app import I_HarmonyStateListener
-from harmony_analyzer import HarmonyAnalyzer
+from harmony_module import HarmonyModule
 
 
 def pitch_at_random_octave(note_name: str):
@@ -13,14 +13,14 @@ def pitch_at_random_octave(note_name: str):
     return pretty_midi.note_name_to_number(note_name + str(octave))
 
 
-class TestHarmonyAnalyzer:
+class TestHarmonyModule:
     def harmony_state_received_by_listener(self) -> HarmonyState:
         return self.listener.update_harmony_state.call_args.args[0]
 
     @pytest.fixture(autouse=True)
     def before_each_test(self):
         self.listener = Mock(spec=I_HarmonyStateListener)
-        self.patient = HarmonyAnalyzer()
+        self.patient = HarmonyModule()
         self.patient.register_listener(self.listener)
 
     def test_will_not_send_harmony_state_if_no_pitches_received(self):

@@ -13,7 +13,7 @@ class DummyListener(I_HarmonyStateListener):
         pass
 
 
-class HarmonyAnalyzer(I_HarmonyAnalyzer):
+class HarmonyModule(I_HarmonyAnalyzer):
     def __init__(self):
         self.listener = DummyListener()
         self.chord_analyzer = ChordAnalyzer()

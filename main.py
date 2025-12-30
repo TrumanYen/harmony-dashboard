@@ -1,7 +1,7 @@
 from app import App, I_HarmonyPresenter
 from harmony_domain import HarmonyState
 from real_time_basic_pitch import PitchDetectingAudioStreamer
-from harmony_analyzer import HarmonyAnalyzer
+from harmony_module import HarmonyModule
 
 
 class DummyHarmonyPresenter(I_HarmonyPresenter):
@@ -20,7 +20,7 @@ class DummyHarmonyPresenter(I_HarmonyPresenter):
 
 if __name__ == "__main__":
     pitch_detecting_audio_streamer = PitchDetectingAudioStreamer()
-    harmony_analyzer = HarmonyAnalyzer()
+    harmony_analyzer = HarmonyModule()
     presenter = DummyHarmonyPresenter()  # TODO: use a real presenter
 
     app = App(
