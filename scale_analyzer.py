@@ -1,3 +1,6 @@
+from abc import ABC, abstractmethod
+from collections import deque
+
 import numpy as np
 
 from harmony_domain import (
@@ -32,7 +35,60 @@ class ScaleAnalyzer:
         return self.DEFAULT_WRAPPED_PITCH_TO_NOTE_MAPPING[wrapped_pitch]
 
 
-class ConvolutionalScaleDetector:
+class I_ConvolutionalScaleDetector(ABC):
+    @abstractmethod
+    def insert_chord(self, chord: ScaleAgnosticChord):
+        pass
+
+    @abstractmethod
+    def remove_chord(self, chord: ScaleAgnosticChord):
+        pass
+
+    @abstractmethod
+    def predict_tonal_center(self) -> int:
+        pass
+
+
+class SlidingWindowScaleDetector:
+    """
+    Uses the ConvolutionalScaleDetector under the hood, but manages a sliding window
+    of chords to feed into the ConvolutionalScaleDetector
+    """
+
+    def __init__(self, convolutional_scale_detector: I_ConvolutionalScaleDetector):
+        self.SLIDING_WINDOW_SIZE = 10
+        self.convolutional_scale_detector = convolutional_scale_detector
+        self.fifo_chord_window = deque()
+        self.current_tonal_center = None
+
+    def recalculate_tonal_center_given_new_chord(self, chord: ScaleAgnosticChord):
+        if self.fifo_chord_window and chord == self.fifo_chord_window[-1]:
+            # chord was not changed since last update
+            return
+        self.fifo_chord_window.append(chord)
+        self.convolutional_scale_detector.insert_chord(chord)
+        if len(self.fifo_chord_window) > self.SLIDING_WINDOW_SIZE:
+            oldest_chord = self.fifo_chord_window.popleft()
+            self.convolutional_scale_detector.remove_chord(oldest_chord)
+
+        self.current_tonal_center = (
+            self.convolutional_scale_detector.predict_tonal_center()
+        )
+
+
+class ConvolutionalScaleDetector(I_ConvolutionalScaleDetector):
+    """
+    jist of the algorithm:
+    - represent recently detected chords in a 2d array where rows are the chord type
+      and columns are the root note (wrapped between A and G#)
+    - each tonal center can be represented as a kernel (reward certain chords like
+      tonic, dominant, submediant, while punishing other chords that don't fit)
+    - The kernels for each tonal center are identical but shifted (and wrapped)
+      along the x axis, so they are translation invariant.
+    - Use convolution to find the most likely tonal center like you would use
+      convolution to detect the location of a specific shape in an image
+    """
+
     def __init__(self):
         self.chord_type_to_row_num_map = {
             ChordType.MAJOR: 0,
