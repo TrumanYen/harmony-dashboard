@@ -1,5 +1,5 @@
 """
-Thanks google gemini for writing my UI for me 👉👈
+Thanks google gemini and chat GPT for writing (most of) my UI for me 👉👈
 """
 
 from queue import Queue
@@ -57,6 +57,9 @@ class CircleDisplay(ctk.CTkFrame):
 
     def draw_clock_circles(self, event=None):
         self.canvas.delete("all")
+        self.text_ids.clear()
+        self.circle_ids.clear()
+        self.currently_highlighted_circle_indices.clear()
 
         # Get current dimensions
         width = self.canvas.winfo_width()
