@@ -84,7 +84,7 @@ class App:
 
     def run(self):
         self.pitch_streamer.start_streaming()
-        print("Started Pitch-Detecting Audio Streamer.  Press Enter to stop...")
-        input()  # TODO: run presenter rather than waiting for enter key
+        print("Started Pitch-Detecting Audio Streamer.")
+        self.presenter.run_ui_until_stopped_by_user()
         self.pitch_streamer.stop_streaming()
         print("Stopped Pitch-Detecting Audio Streamer.")

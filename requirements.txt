@@ -6,6 +6,8 @@ cachetools==6.2.4
 certifi==2025.11.12
 cffi==2.0.0
 charset-normalizer==3.4.4
+customtkinter==5.2.2
+darkdetect==0.8.0
 decorator==5.2.1
 flatbuffers==25.12.19
 gast==0.7.0
