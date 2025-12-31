@@ -139,3 +139,18 @@ class TestEnharmonicResolver:
 
         assert harmony_state.notes_detected == expected_notes
         assert harmony_state.current_chord == None
+
+    def test_will_not_confuse_zeros_for_none(self):
+        wrapped_pitch_for_a = 0
+        a_chord = ScaleAgnosticChord(root_wrapped_pitch=0, chord_type=ChordType.MAJOR)
+
+        harmony_state = self.patient.convert_from_wrapped_pitches_to_notes(
+            new_tonal_center_wrapped_pitch=wrapped_pitch_for_a,
+            new_chord=a_chord,
+            detected_notes_wrapped_pitches=[],
+        )
+
+        assert harmony_state.current_major_scale == Note(NoteName.A, 0)
+        assert harmony_state.current_chord == Chord(
+            Note(NoteName.A, 0), ChordType.MAJOR
+        )

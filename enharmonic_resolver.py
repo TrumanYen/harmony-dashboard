@@ -77,7 +77,7 @@ class EnharmonicResolver:
         )
 
     def _resolve_tonal_center(self, tonal_center_wrapped_pitch: int | None):
-        if tonal_center_wrapped_pitch:
+        if tonal_center_wrapped_pitch is not None:
             self.current_tonal_center_wrapped_pitch = tonal_center_wrapped_pitch
             # Get circle index of scale closest to C so there's as few sharps and flats as possible
             self.current_tonal_center_circle_index = self.circle_index_calculator.circle_index_for_enharmonic_equivalent_closest_to_tonal_center(
@@ -98,7 +98,7 @@ class EnharmonicResolver:
             wrapped_pitch=new_chord.root_wrapped_pitch,
             scale_tonal_center_circle_index=self.current_tonal_center_circle_index,
         )
-        if candidate_chord_root_circle_index:
+        if candidate_chord_root_circle_index is not None:
             self.current_chord_root_circle_index = candidate_chord_root_circle_index
         else:
             # Note that we might not have gotten a chord root circle index if it doesn't
@@ -106,7 +106,7 @@ class EnharmonicResolver:
             # last chord we got.  If we don't have a previous chord we can use the scale
             tonal_center = (
                 self.current_chord_root_circle_index
-                if self.current_chord_root_circle_index
+                if self.current_chord_root_circle_index is not None
                 else self.current_tonal_center_circle_index
             )
             self.current_chord_root_circle_index = self.circle_index_calculator.circle_index_for_enharmonic_equivalent_closest_to_tonal_center(
@@ -129,12 +129,12 @@ class EnharmonicResolver:
                 wrapped_pitch=pitch,
                 scale_tonal_center_circle_index=self.current_tonal_center_circle_index,
             )
-            if not circle_index:
+            if circle_index is None:
                 # If note is not strictly part of scale, base it off current chord.  If that's not available base it off
                 # E such that all black keys are sharps
                 current_chord_circle_index = (
                     self.current_chord_root_circle_index
-                    if self.current_chord_root_circle_index
+                    if self.current_chord_root_circle_index is not None
                     else 4
                 )
                 circle_index = self.circle_index_calculator.circle_index_for_enharmonic_equivalent_closest_to_tonal_center(
