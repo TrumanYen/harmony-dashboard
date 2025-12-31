@@ -1,7 +1,7 @@
 import pytest
 
-from harmony_domain import Note, NoteName, Chord, ChordType, ScaleAgnosticChord
-from enharmonic_resolver import EnharmonicResolver
+from ..harmony_domain import Note, NoteName, Chord, ChordType, ScaleAgnosticChord
+from ..enharmonic_resolver import EnharmonicResolver
 
 
 class TestEnharmonicResolver:

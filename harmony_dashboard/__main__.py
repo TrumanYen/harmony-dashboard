@@ -1,7 +1,7 @@
-from app import App
-from real_time_basic_pitch import PitchDetectingAudioStreamer
-from harmony_module import HarmonyModule
-from ui import TkinterAdapter
+from .app import App
+from .real_time_basic_pitch import PitchDetectingAudioStreamer
+from .harmony_module import HarmonyModule
+from .ui import TkinterAdapter
 
 
 if __name__ == "__main__":

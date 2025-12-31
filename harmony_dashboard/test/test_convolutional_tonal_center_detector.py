@@ -1,7 +1,7 @@
 import pytest
 
-from harmony_domain import ScaleAgnosticChord, ChordType
-from tonal_center_detector import ConvolutionalTonalCenterDetector
+from ..harmony_domain import ScaleAgnosticChord, ChordType
+from ..tonal_center_detector import ConvolutionalTonalCenterDetector
 
 
 class TestConvolutionalTonalCenterDetector:

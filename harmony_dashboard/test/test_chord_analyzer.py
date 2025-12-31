@@ -2,8 +2,8 @@ import pytest
 import pretty_midi
 import random
 
-from harmony_domain import ChordType, ScaleAgnosticChord
-from chord_analyzer import ChordAnalyzer
+from ..harmony_domain import ChordType, ScaleAgnosticChord
+from ..chord_analyzer import ChordAnalyzer
 
 
 def pitch_at_random_octave(note_name: str):

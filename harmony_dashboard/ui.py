@@ -8,8 +8,8 @@ import math
 
 import customtkinter as ctk
 
-from harmony_domain import HarmonyState, Note, NoteName, Chord, ChordType
-from app import I_HarmonyPresenter
+from .harmony_domain import HarmonyState, Note, NoteName, Chord, ChordType
+from .app import I_HarmonyPresenter
 
 # Global settings for the app appearance
 ctk.set_appearance_mode("system")  # Automatically matches OS theme

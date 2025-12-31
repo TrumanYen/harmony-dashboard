@@ -3,8 +3,8 @@ from unittest.mock import Mock
 import random
 
 
-from harmony_domain import ScaleAgnosticChord, ChordType
-from tonal_center_detector import (
+from ..harmony_domain import ScaleAgnosticChord, ChordType
+from ..tonal_center_detector import (
     I_ConvolutionalTonalCenterDetector,
     SlidingWindowTonalCenterDetector,
 )

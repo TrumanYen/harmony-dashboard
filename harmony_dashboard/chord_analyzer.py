@@ -1,12 +1,8 @@
 from typing import NamedTuple
 
 
-from harmony_domain import (
-    NoteName,
-    Note,
+from .harmony_domain import (
     ChordType,
-    Chord,
-    HarmonyState,
     ScaleAgnosticChord,
 )
 

@@ -1,11 +1,11 @@
-from app import I_HarmonyAnalyzer, I_HarmonyStateListener
-from harmony_domain import HarmonyState
-from chord_analyzer import ChordAnalyzer
-from tonal_center_detector import (
+from .app import I_HarmonyAnalyzer, I_HarmonyStateListener
+from .harmony_domain import HarmonyState
+from .chord_analyzer import ChordAnalyzer
+from .tonal_center_detector import (
     SlidingWindowTonalCenterDetector,
     ConvolutionalTonalCenterDetector,
 )
-from enharmonic_resolver import EnharmonicResolver
+from .enharmonic_resolver import EnharmonicResolver
 
 """
 NOTE: "Wrapped pitches" here refers to semitones from A, zero-indexed, wrapped between 0-11 incl.

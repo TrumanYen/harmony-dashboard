@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from harmony_domain import HarmonyState
+from .harmony_domain import HarmonyState
 
 
 # Interfaces
@@ -84,7 +84,5 @@ class App:
 
     def run(self):
         self.pitch_streamer.start_streaming()
-        print("Started Pitch-Detecting Audio Streamer.")
         self.presenter.run_ui_until_stopped_by_user()
         self.pitch_streamer.stop_streaming()
-        print("Stopped Pitch-Detecting Audio Streamer.")
