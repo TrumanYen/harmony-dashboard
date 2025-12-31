@@ -1,6 +1,6 @@
 import pytest
 
-from ..harmony_domain import Note, NoteName
+from ...harmony_domain import Note, NoteName
 from ..enharmonic_resolver import CircleIndexCalculator
 
 

@@ -1,6 +1,6 @@
 import pytest
 
-from ..harmony_domain import Note, NoteName, Chord, ChordType, ScaleAgnosticChord
+from ...harmony_domain import Note, NoteName, Chord, ChordType, ScaleAgnosticChord
 from ..enharmonic_resolver import EnharmonicResolver
 
 

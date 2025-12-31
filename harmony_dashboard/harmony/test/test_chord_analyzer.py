@@ -2,7 +2,7 @@ import pytest
 import pretty_midi
 import random
 
-from ..harmony_domain import ChordType, ScaleAgnosticChord
+from ...harmony_domain import ChordType, ScaleAgnosticChord
 from ..chord_analyzer import ChordAnalyzer
 
 

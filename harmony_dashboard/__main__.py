@@ -1,6 +1,6 @@
 from .app import App
 from .real_time_basic_pitch import PitchDetectingAudioStreamer
-from .harmony_module import HarmonyModule
+from .harmony import HarmonyModule
 from .ui import TkinterAdapter
 
 

@@ -1,5 +1,5 @@
-from .app import I_HarmonyAnalyzer, I_HarmonyStateListener
-from .harmony_domain import HarmonyState
+from ..app import I_HarmonyAnalyzer, I_HarmonyStateListener
+from ..harmony_domain import HarmonyState
 from .chord_analyzer import ChordAnalyzer
 from .tonal_center_detector import (
     SlidingWindowTonalCenterDetector,

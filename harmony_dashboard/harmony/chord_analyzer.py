@@ -1,7 +1,7 @@
 from typing import NamedTuple
 
 
-from .harmony_domain import (
+from ..harmony_domain import (
     ChordType,
     ScaleAgnosticChord,
 )

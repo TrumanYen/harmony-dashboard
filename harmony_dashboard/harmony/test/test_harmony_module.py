@@ -3,8 +3,8 @@ import pretty_midi
 from unittest.mock import Mock
 import random
 
-from ..harmony_domain import NoteName, Note, ChordType, Chord, HarmonyState
-from ..app import I_HarmonyStateListener
+from ...harmony_domain import NoteName, Note, ChordType, Chord, HarmonyState
+from ...app import I_HarmonyStateListener
 from ..harmony_module import HarmonyModule
 
 

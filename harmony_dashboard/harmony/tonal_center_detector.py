@@ -3,7 +3,7 @@ from collections import deque
 
 import numpy as np
 
-from .harmony_domain import (
+from ..harmony_domain import (
     NoteName,
     Note,
     ChordType,

@@ -1,6 +1,6 @@
 from math import ceil, floor
 
-from .harmony_domain import (
+from ..harmony_domain import (
     Note,
     NoteName,
     ScaleAgnosticChord,
