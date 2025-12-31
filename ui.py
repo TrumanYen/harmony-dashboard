@@ -210,62 +210,65 @@ class TkinterUi(ctk.CTk):
     def update_state(self, event):
         new_harmony_state = self.state_update_queue.get()
         if new_harmony_state:
-            new_scale = new_harmony_state.current_major_scale
-            no_scale_cached = (
-                self.harmony_state is None
-                or self.harmony_state.current_major_scale is None
-            )
-            if new_scale and (
-                no_scale_cached or new_scale != self.harmony_state.current_major_scale
-            ):
-                self.scale_view.clear_text()
-                scale_str = self.formatter.format_note_to_string(new_scale)
-                index_in_circle = (
-                    self.formatter.convert_note_to_position_on_circle_of_fifths(
-                        new_scale
-                    )
-                )
-                colour_scheme = self.formatter.get_colour_for_note(new_scale)
-                self.scale_view.update_circle(
-                    index=index_in_circle,
-                    new_text=scale_str,
-                    colour=colour_scheme.fill_colour,
-                    text_colour=colour_scheme.text_colour,
-                )
-            new_chord = new_harmony_state.current_chord
-            no_chord_cached = (
-                self.harmony_state is None or self.harmony_state.current_chord is None
-            )
-            if new_chord and (
-                no_chord_cached or new_chord != self.harmony_state.current_chord
-            ):
-                self.chord_view.clear_text()
-                chord_str = self.formatter.format_chord_to_string(new_chord)
-                index_in_circle = (
-                    self.formatter.convert_note_to_position_on_circle_of_fifths(
-                        new_chord.root
-                    )
-                )
-                colour_scheme = self.formatter.get_colour_for_note(new_chord.root)
-                self.chord_view.update_circle(
-                    index=index_in_circle,
-                    new_text=chord_str,
-                    colour=colour_scheme.fill_colour,
-                    text_colour=colour_scheme.text_colour,
-                )
-
-            self.notes_view.clear_text()
-            for note in new_harmony_state.notes_detected:
-                note_str = self.formatter.format_note_to_string(note)
-                index_in_circle = self.formatter.convert_note_to_wrapped_semitones(note)
-                colour_scheme = self.formatter.get_colour_for_note(note)
-                self.notes_view.update_circle(
-                    index=index_in_circle,
-                    new_text=note_str,
-                    colour=colour_scheme.fill_colour,
-                    text_colour=colour_scheme.text_colour,
-                )
+            self._update_scale(new_harmony_state.current_major_scale)
+            self._update_chord(new_harmony_state.current_chord)
+            self._update_notes(new_harmony_state.notes_detected)
             self.harmony_state = new_harmony_state
+
+    def _update_scale(self, new_scale: Note):
+        no_scale_cached = (
+            self.harmony_state is None or self.harmony_state.current_major_scale is None
+        )
+        if new_scale and (
+            no_scale_cached or new_scale != self.harmony_state.current_major_scale
+        ):
+            self.scale_view.clear_text()
+            scale_str = self.formatter.format_note_to_string(new_scale)
+            index_in_circle = (
+                self.formatter.convert_note_to_position_on_circle_of_fifths(new_scale)
+            )
+            colour_scheme = self.formatter.get_colour_for_note(new_scale)
+            self.scale_view.update_circle(
+                index=index_in_circle,
+                new_text=scale_str,
+                colour=colour_scheme.fill_colour,
+                text_colour=colour_scheme.text_colour,
+            )
+
+    def _update_chord(self, new_chord: Chord):
+        no_chord_cached = (
+            self.harmony_state is None or self.harmony_state.current_chord is None
+        )
+        if new_chord and (
+            no_chord_cached or new_chord != self.harmony_state.current_chord
+        ):
+            self.chord_view.clear_text()
+            chord_str = self.formatter.format_chord_to_string(new_chord)
+            index_in_circle = (
+                self.formatter.convert_note_to_position_on_circle_of_fifths(
+                    new_chord.root
+                )
+            )
+            colour_scheme = self.formatter.get_colour_for_note(new_chord.root)
+            self.chord_view.update_circle(
+                index=index_in_circle,
+                new_text=chord_str,
+                colour=colour_scheme.fill_colour,
+                text_colour=colour_scheme.text_colour,
+            )
+
+    def _update_notes(self, notes: list[Note]):
+        self.notes_view.clear_text()
+        for note in notes:
+            note_str = self.formatter.format_note_to_string(note)
+            index_in_circle = self.formatter.convert_note_to_wrapped_semitones(note)
+            colour_scheme = self.formatter.get_colour_for_note(note)
+            self.notes_view.update_circle(
+                index=index_in_circle,
+                new_text=note_str,
+                colour=colour_scheme.fill_colour,
+                text_colour=colour_scheme.text_colour,
+            )
 
 
 if __name__ == "__main__":
