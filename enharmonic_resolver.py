@@ -60,46 +60,62 @@ class EnharmonicResolver:
         ):
             # Only recalculate if tonal center changed or not cached
             # Get circle index of scale closest to C so there's as few sharps and flats as possible
-            self.current_tonal_center_circle_index = self.circle_index_calculator.circle_index_for_enharmonic_equivalent_closest_to_tonal_center(
-                wrapped_pitch=current_tonal_center_wrapped_pitch,
-                tonal_center_circle_index=0,
-            )
-            self.current_tonal_center_note = (
-                self.circle_index_calculator.convert_circle_index_to_note(
-                    self.current_tonal_center_circle_index
-                )
-            )
+            self._resolve_tonal_center(current_tonal_center_wrapped_pitch)
         if (
             not self.current_scale_agnostic_chord
             or not self.current_chord_root_circle_index
             or self.current_scale_agnostic_chord != current_chord
         ):
             # Only recalculate chord if changed or not cached
-            candidate_chord_root_circle_index = self.circle_index_calculator.circle_index_for_enharmonic_equivalent_within_scale_if_exists(
-                wrapped_pitch=current_chord.root_wrapped_pitch,
-                scale_tonal_center_circle_index=self.current_tonal_center_circle_index,
+            self._resolve_chord_root(current_chord)
+
+        return HarmonyState(
+            current_major_scale=self.current_tonal_center_note,
+            current_chord=self.current_chord,
+            notes_detected=self._resolve_detected_notes(detected_notes_wrapped_pitches),
+        )
+
+    def _resolve_tonal_center(self, tonal_center_wrapped_pitch: int):
+        self.current_tonal_center_circle_index = self.circle_index_calculator.circle_index_for_enharmonic_equivalent_closest_to_tonal_center(
+            wrapped_pitch=tonal_center_wrapped_pitch,
+            tonal_center_circle_index=0,
+        )
+        self.current_tonal_center_note = (
+            self.circle_index_calculator.convert_circle_index_to_note(
+                self.current_tonal_center_circle_index
             )
-            if candidate_chord_root_circle_index:
-                self.current_chord_root_circle_index = candidate_chord_root_circle_index
-            else:
-                # Note that we might not have gotten a chord root circle index if it doesn't
-                # belong in the current scale.  In this case, use whatever is closest to the
-                # last chord we got.  If we don't have a previous chord we can use the scale
-                tonal_center = (
-                    self.current_chord_root_circle_index
-                    if self.current_chord_root_circle_index
-                    else self.current_tonal_center_circle_index
-                )
-                self.current_chord_root_circle_index = self.circle_index_calculator.circle_index_for_enharmonic_equivalent_closest_to_tonal_center(
-                    wrapped_pitch=current_chord.root_wrapped_pitch,
-                    tonal_center_circle_index=tonal_center,
-                )
-            self.current_chord = Chord(
-                root=self.circle_index_calculator.convert_circle_index_to_note(
-                    self.current_chord_root_circle_index
-                ),
-                chord_type=current_chord.chord_type,
+        )
+
+    def _resolve_chord_root(self, incoming_chord: ScaleAgnosticChord):
+        candidate_chord_root_circle_index = self.circle_index_calculator.circle_index_for_enharmonic_equivalent_within_scale_if_exists(
+            wrapped_pitch=incoming_chord.root_wrapped_pitch,
+            scale_tonal_center_circle_index=self.current_tonal_center_circle_index,
+        )
+        if candidate_chord_root_circle_index:
+            self.current_chord_root_circle_index = candidate_chord_root_circle_index
+        else:
+            # Note that we might not have gotten a chord root circle index if it doesn't
+            # belong in the current scale.  In this case, use whatever is closest to the
+            # last chord we got.  If we don't have a previous chord we can use the scale
+            tonal_center = (
+                self.current_chord_root_circle_index
+                if self.current_chord_root_circle_index
+                else self.current_tonal_center_circle_index
             )
+            self.current_chord_root_circle_index = self.circle_index_calculator.circle_index_for_enharmonic_equivalent_closest_to_tonal_center(
+                wrapped_pitch=incoming_chord.root_wrapped_pitch,
+                tonal_center_circle_index=tonal_center,
+            )
+        self.current_chord = Chord(
+            root=self.circle_index_calculator.convert_circle_index_to_note(
+                self.current_chord_root_circle_index
+            ),
+            chord_type=incoming_chord.chord_type,
+        )
+
+    def _resolve_detected_notes(
+        self, detected_notes_wrapped_pitches: list[int]
+    ) -> list[Note]:
         detected_notes = []
         for pitch in detected_notes_wrapped_pitches:
             circle_index = self.circle_index_calculator.circle_index_for_enharmonic_equivalent_within_scale_if_exists(
@@ -115,12 +131,7 @@ class EnharmonicResolver:
             detected_notes.append(
                 self.circle_index_calculator.convert_circle_index_to_note(circle_index)
             )
-
-        return HarmonyState(
-            current_major_scale=self.current_tonal_center_note,
-            current_chord=self.current_chord,
-            notes_detected=detected_notes,
-        )
+        return detected_notes
 
 
 class CircleIndexCalculator:
