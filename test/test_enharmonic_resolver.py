@@ -113,7 +113,7 @@ class TestEnharmonicResolver:
 
         assert harmony_state.notes_detected == expected_notes
 
-    def test_will_assume_c_major_if_no_scale_provided(self):
+    def test_will_not_output_scale_if_no_scale_provided(self):
         tonal_center = None
         c_chord = ScaleAgnosticChord(root_wrapped_pitch=3, chord_type=ChordType.MAJOR)
 
@@ -123,7 +123,7 @@ class TestEnharmonicResolver:
             detected_notes_wrapped_pitches=[],
         )
 
-        assert harmony_state.current_major_scale == Note(NoteName.C, 0)
+        assert harmony_state.current_major_scale == None
 
     def test_will_apply_default_key_signature_to_all_notes_if_no_chord_provided(self):
         pitches_outside_c = [11]

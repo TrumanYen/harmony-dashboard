@@ -136,4 +136,6 @@ class ConvolutionalTonalCenterDetector(I_ConvolutionalTonalCenterDetector):
 
     def predict_tonal_center(self):
         prediction_vector = np.sum(self.kernels_3d * self.input_chord_data, axis=(1, 2))
+        if not np.any(prediction_vector):
+            return None
         return np.argmax(prediction_vector)

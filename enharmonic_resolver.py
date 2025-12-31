@@ -84,14 +84,14 @@ class EnharmonicResolver:
                 wrapped_pitch=tonal_center_wrapped_pitch,
                 tonal_center_circle_index=0,
             )
+            self.current_tonal_center_note = (
+                self.circle_index_calculator.convert_circle_index_to_note(
+                    self.current_tonal_center_circle_index
+                )
+            )
         else:
             # assume c major if not provided
             self.current_tonal_center_circle_index = 0
-        self.current_tonal_center_note = (
-            self.circle_index_calculator.convert_circle_index_to_note(
-                self.current_tonal_center_circle_index
-            )
-        )
 
     def _resolve_chord_root(self, new_chord: ScaleAgnosticChord):
         candidate_chord_root_circle_index = self.circle_index_calculator.circle_index_for_enharmonic_equivalent_within_scale_if_exists(
