@@ -3,6 +3,7 @@ Thanks google gemini for writing my UI for me 👉👈
 """
 
 from queue import Queue
+from dataclasses import dataclass
 import math
 
 import customtkinter as ctk
@@ -13,6 +14,8 @@ from app import I_HarmonyPresenter
 # Global settings for the app appearance
 ctk.set_appearance_mode("system")  # Automatically matches OS theme
 ctk.set_default_color_theme("blue")
+
+FONT = "Nunito"
 
 
 class TkinterAdapter(I_HarmonyPresenter):
@@ -36,6 +39,8 @@ class CircleDisplay(ctk.CTkFrame):
 
         self.title_text = title
         self.text_ids = []
+        self.circle_ids = []
+        self.default_circle_colour = "#43484c"
 
         # Create a canvas to draw circles
         # bg_color matches the frame, highlightthickness=0 removes border
@@ -65,7 +70,7 @@ class CircleDisplay(ctk.CTkFrame):
             center_x,
             center_y,
             text=self.title_text,  # Assuming you store the title
-            font=("Arial", 24, "bold"),
+            font=(FONT, 24, "bold"),
             fill="white" if ctk.get_appearance_mode() == "Dark" else "black",
         )
         for i in range(12):
@@ -77,29 +82,38 @@ class CircleDisplay(ctk.CTkFrame):
             y = center_y + radius * math.sin(angle)
 
             # Draw the circle
-            self.canvas.create_oval(
+            circle_id = self.canvas.create_oval(
                 x - circle_size,
                 y - circle_size,
                 x + circle_size,
                 y + circle_size,
-                fill="#43484c",
+                fill=self.default_circle_colour,
                 outline="grey",
                 width=2,
             )
             t_id = self.canvas.create_text(
-                x, y, text="--", font=("Arial", 10), fill="white"
+                x, y, text="", font=(FONT, 10), fill="#36454F"
             )
             self.text_ids.append(t_id)
+            self.circle_ids.append(circle_id)
 
     def clear_text(self):
         for text_id in self.text_ids:
             self.canvas.itemconfig(text_id, text="")
+        for circle_id in self.circle_ids:
+            self.canvas.itemconfig(circle_id, fill=self.default_circle_colour)
 
-    def update_text(self, index: int, new_text: str):
-        self.canvas.itemconfig(self.text_ids[index], text=new_text)
+    def update_circle(self, index: int, new_text: str, colour: str, text_colour: str):
+        self.canvas.itemconfig(self.circle_ids[index], fill=colour)
+        self.canvas.itemconfig(self.text_ids[index], text=new_text, fill=text_colour)
 
 
 class Formatter:
+    @dataclass
+    class ColourScheme:
+        fill_colour: str
+        text_colour: str
+
     def __init__(self):
         self.chord_type_to_str_map = {
             ChordType.MAJOR: "",
@@ -117,6 +131,15 @@ class Formatter:
             NoteName.E: 4,
             NoteName.F: 5,
             NoteName.G: 7,
+        }
+        self.note_name_to_colour_map = {
+            NoteName.A: self.ColourScheme(fill_colour="#C6AF83", text_colour="#43484c"),
+            NoteName.B: self.ColourScheme(fill_colour="#00FFE5", text_colour="#43484c"),
+            NoteName.C: self.ColourScheme(fill_colour="#FFFFFF", text_colour="#43484c"),
+            NoteName.D: self.ColourScheme(fill_colour="#FFEA00", text_colour="#43484c"),
+            NoteName.E: self.ColourScheme(fill_colour="#AB3553", text_colour="#ffffff"),
+            NoteName.F: self.ColourScheme(fill_colour="#277C43", text_colour="#ffffff"),
+            NoteName.G: self.ColourScheme(fill_colour="#6F4E37", text_colour="#ffffff"),
         }
 
     def format_note_to_string(self, note: Note):
@@ -141,6 +164,9 @@ class Formatter:
     def convert_note_to_position_on_circle_of_fifths(self, note: Note):
         wrapped_semitones = self.convert_note_to_wrapped_semitones(note)
         return (7 * wrapped_semitones) % 12
+
+    def get_colour_for_note(self, note: Note):
+        return self.note_name_to_colour_map[note.note_name]
 
 
 class TkinterUi(ctk.CTk):
@@ -183,10 +209,18 @@ class TkinterUi(ctk.CTk):
             current_scale = self.harmony_state.current_major_scale
             if current_scale:
                 scale_str = self.formatter.format_note_to_string(current_scale)
-                index_in_circle = self.formatter.convert_note_to_wrapped_semitones(
-                    current_scale
+                index_in_circle = (
+                    self.formatter.convert_note_to_position_on_circle_of_fifths(
+                        current_scale
+                    )
                 )
-                self.scale_view.update_text(index=index_in_circle, new_text=scale_str)
+                colour_scheme = self.formatter.get_colour_for_note(current_scale)
+                self.scale_view.update_circle(
+                    index=index_in_circle,
+                    new_text=scale_str,
+                    colour=colour_scheme.fill_colour,
+                    text_colour=colour_scheme.text_colour,
+                )
             self.chord_view.clear_text()
             current_chord = self.harmony_state.current_chord
             if current_chord:
@@ -196,13 +230,25 @@ class TkinterUi(ctk.CTk):
                         current_chord.root
                     )
                 )
-                self.chord_view.update_text(index=index_in_circle, new_text=chord_str)
+                colour_scheme = self.formatter.get_colour_for_note(current_chord.root)
+                self.chord_view.update_circle(
+                    index=index_in_circle,
+                    new_text=chord_str,
+                    colour=colour_scheme.fill_colour,
+                    text_colour=colour_scheme.text_colour,
+                )
             self.notes_view.clear_text()
 
             for note in self.harmony_state.notes_detected:
                 note_str = self.formatter.format_note_to_string(note)
                 index_in_circle = self.formatter.convert_note_to_wrapped_semitones(note)
-                self.notes_view.update_text(index=index_in_circle, new_text=note_str)
+                colour_scheme = self.formatter.get_colour_for_note(note)
+                self.notes_view.update_circle(
+                    index=index_in_circle,
+                    new_text=note_str,
+                    colour=colour_scheme.fill_colour,
+                    text_colour=colour_scheme.text_colour,
+                )
 
 
 if __name__ == "__main__":
