@@ -42,32 +42,33 @@ class EnharmonicResolver:
         self.current_tonal_center_wrapped_pitch = None
         self.current_tonal_center_circle_index = None
         self.current_tonal_center_note = None
+
         self.current_scale_agnostic_chord = None
         self.current_chord_root_circle_index = None
         self.current_chord = None
 
     def convert_from_wrapped_pitches_to_notes(
         self,
-        current_tonal_center_wrapped_pitch: int,
-        current_chord: ScaleAgnosticChord,
+        new_tonal_center_wrapped_pitch: int | None,
+        new_chord: ScaleAgnosticChord | None,
         detected_notes_wrapped_pitches: list[int],
     ) -> HarmonyState:
-        if (
-            not self.current_tonal_center_wrapped_pitch
-            or not self.current_tonal_center_circle_index
-            or self.current_tonal_center_wrapped_pitch
-            != current_tonal_center_wrapped_pitch
-        ):
-            # Only recalculate if tonal center changed or not cached
-            # Get circle index of scale closest to C so there's as few sharps and flats as possible
-            self._resolve_tonal_center(current_tonal_center_wrapped_pitch)
-        if (
-            not self.current_scale_agnostic_chord
-            or not self.current_chord_root_circle_index
-            or self.current_scale_agnostic_chord != current_chord
-        ):
-            # Only recalculate chord if changed or not cached
-            self._resolve_chord_root(current_chord)
+        no_cached_tonal_center = (
+            self.current_tonal_center_wrapped_pitch is None
+            or self.current_tonal_center_circle_index is None
+            or self.current_tonal_center_note is None
+        )
+        new_tonal_center_discovered = (
+            new_tonal_center_wrapped_pitch is not None
+            and new_tonal_center_wrapped_pitch
+            != self.current_tonal_center_wrapped_pitch
+        )
+        if no_cached_tonal_center or new_tonal_center_discovered:
+            self._resolve_tonal_center(new_tonal_center_wrapped_pitch)
+
+        new_chord_discovered = new_chord is not None and new_chord != self.current_chord
+        if new_chord_discovered:
+            self._resolve_chord_root(new_chord)
 
         return HarmonyState(
             current_major_scale=self.current_tonal_center_note,
@@ -75,20 +76,26 @@ class EnharmonicResolver:
             notes_detected=self._resolve_detected_notes(detected_notes_wrapped_pitches),
         )
 
-    def _resolve_tonal_center(self, tonal_center_wrapped_pitch: int):
-        self.current_tonal_center_circle_index = self.circle_index_calculator.circle_index_for_enharmonic_equivalent_closest_to_tonal_center(
-            wrapped_pitch=tonal_center_wrapped_pitch,
-            tonal_center_circle_index=0,
-        )
+    def _resolve_tonal_center(self, tonal_center_wrapped_pitch: int | None):
+        if tonal_center_wrapped_pitch:
+            self.current_tonal_center_wrapped_pitch = tonal_center_wrapped_pitch
+            # Get circle index of scale closest to C so there's as few sharps and flats as possible
+            self.current_tonal_center_circle_index = self.circle_index_calculator.circle_index_for_enharmonic_equivalent_closest_to_tonal_center(
+                wrapped_pitch=tonal_center_wrapped_pitch,
+                tonal_center_circle_index=0,
+            )
+        else:
+            # assume c major if not provided
+            self.current_tonal_center_circle_index = 0
         self.current_tonal_center_note = (
             self.circle_index_calculator.convert_circle_index_to_note(
                 self.current_tonal_center_circle_index
             )
         )
 
-    def _resolve_chord_root(self, incoming_chord: ScaleAgnosticChord):
+    def _resolve_chord_root(self, new_chord: ScaleAgnosticChord):
         candidate_chord_root_circle_index = self.circle_index_calculator.circle_index_for_enharmonic_equivalent_within_scale_if_exists(
-            wrapped_pitch=incoming_chord.root_wrapped_pitch,
+            wrapped_pitch=new_chord.root_wrapped_pitch,
             scale_tonal_center_circle_index=self.current_tonal_center_circle_index,
         )
         if candidate_chord_root_circle_index:
@@ -103,14 +110,14 @@ class EnharmonicResolver:
                 else self.current_tonal_center_circle_index
             )
             self.current_chord_root_circle_index = self.circle_index_calculator.circle_index_for_enharmonic_equivalent_closest_to_tonal_center(
-                wrapped_pitch=incoming_chord.root_wrapped_pitch,
+                wrapped_pitch=new_chord.root_wrapped_pitch,
                 tonal_center_circle_index=tonal_center,
             )
         self.current_chord = Chord(
             root=self.circle_index_calculator.convert_circle_index_to_note(
                 self.current_chord_root_circle_index
             ),
-            chord_type=incoming_chord.chord_type,
+            chord_type=new_chord.chord_type,
         )
 
     def _resolve_detected_notes(
@@ -123,10 +130,16 @@ class EnharmonicResolver:
                 scale_tonal_center_circle_index=self.current_tonal_center_circle_index,
             )
             if not circle_index:
-                # If note is not strictly part of scale, base it off current chord
+                # If note is not strictly part of scale, base it off current chord.  If that's not available base it off
+                # E such that all black keys are sharps
+                current_chord_circle_index = (
+                    self.current_chord_root_circle_index
+                    if self.current_chord_root_circle_index
+                    else 4
+                )
                 circle_index = self.circle_index_calculator.circle_index_for_enharmonic_equivalent_closest_to_tonal_center(
                     wrapped_pitch=pitch,
-                    tonal_center_circle_index=self.current_chord_root_circle_index,
+                    tonal_center_circle_index=current_chord_circle_index,
                 )
             detected_notes.append(
                 self.circle_index_calculator.convert_circle_index_to_note(circle_index)

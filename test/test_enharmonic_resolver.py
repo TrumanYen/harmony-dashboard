@@ -42,8 +42,8 @@ class TestEnharmonicResolver:
         )
 
         harmony_state = self.patient.convert_from_wrapped_pitches_to_notes(
-            current_tonal_center_wrapped_pitch=wrapped_pitch_for_e_flat,
-            current_chord=b_flat_chord,
+            new_tonal_center_wrapped_pitch=wrapped_pitch_for_e_flat,
+            new_chord=b_flat_chord,
             detected_notes_wrapped_pitches=[],
         )
 
@@ -63,13 +63,13 @@ class TestEnharmonicResolver:
         )
 
         self.patient.convert_from_wrapped_pitches_to_notes(
-            current_tonal_center_wrapped_pitch=wrapped_pitch_for_g,
-            current_chord=f_sharp_chord,
+            new_tonal_center_wrapped_pitch=wrapped_pitch_for_g,
+            new_chord=f_sharp_chord,
             detected_notes_wrapped_pitches=[],
         )
         new_harmony_state = self.patient.convert_from_wrapped_pitches_to_notes(
-            current_tonal_center_wrapped_pitch=wrapped_pitch_for_g,
-            current_chord=c_sharp_chord,
+            new_tonal_center_wrapped_pitch=wrapped_pitch_for_g,
+            new_chord=c_sharp_chord,
             detected_notes_wrapped_pitches=[],
         )
 
@@ -90,8 +90,8 @@ class TestEnharmonicResolver:
         ]
 
         harmony_state = self.patient.convert_from_wrapped_pitches_to_notes(
-            current_tonal_center_wrapped_pitch=wrapped_pitch_for_a,
-            current_chord=a_chord,
+            new_tonal_center_wrapped_pitch=wrapped_pitch_for_a,
+            new_chord=a_chord,
             detected_notes_wrapped_pitches=pitches_in_a,
         )
 
@@ -106,9 +106,36 @@ class TestEnharmonicResolver:
         ]
 
         harmony_state = self.patient.convert_from_wrapped_pitches_to_notes(
-            current_tonal_center_wrapped_pitch=wrapped_pitch_for_c,
-            current_chord=e_chord,
+            new_tonal_center_wrapped_pitch=wrapped_pitch_for_c,
+            new_chord=e_chord,
             detected_notes_wrapped_pitches=pitches_outside_c,
         )
 
         assert harmony_state.notes_detected == expected_notes
+
+    def test_will_assume_c_major_if_no_scale_provided(self):
+        tonal_center = None
+        c_chord = ScaleAgnosticChord(root_wrapped_pitch=3, chord_type=ChordType.MAJOR)
+
+        harmony_state = self.patient.convert_from_wrapped_pitches_to_notes(
+            new_tonal_center_wrapped_pitch=tonal_center,
+            new_chord=c_chord,
+            detected_notes_wrapped_pitches=[],
+        )
+
+        assert harmony_state.current_major_scale == Note(NoteName.C, 0)
+
+    def test_will_apply_default_key_signature_to_all_notes_if_no_chord_provided(self):
+        pitches_outside_c = [11]
+        expected_notes = [
+            Note(NoteName.G, 1),  # By default just use sharps for everything
+        ]
+
+        harmony_state = self.patient.convert_from_wrapped_pitches_to_notes(
+            new_tonal_center_wrapped_pitch=None,
+            new_chord=None,
+            detected_notes_wrapped_pitches=pitches_outside_c,
+        )
+
+        assert harmony_state.notes_detected == expected_notes
+        assert harmony_state.current_chord == None
