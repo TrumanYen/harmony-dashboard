@@ -69,7 +69,7 @@ class TestHarmonyModule:
             assert note in actual_notes_detected
         assert len(expected_notes_detected) == len(actual_notes_detected)
 
-    def test_will_return_correct_chord_with_no_default_key_signature_if_no_scale_detected(
+    def test_will_return_correct_chord_with_default_key_signature_if_no_scale_detected(
         self,
     ):
         f_seventh_chord_pitches = [

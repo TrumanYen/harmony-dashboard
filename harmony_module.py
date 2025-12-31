@@ -42,6 +42,7 @@ class HarmonyModule(I_HarmonyAnalyzer):
         ]
         self.listener.update_harmony_state(
             HarmonyState(
+                current_major_scale=None,
                 current_chord=chord_in_current_scale,
                 notes_detected=notes_detected_in_current_scale,
             )

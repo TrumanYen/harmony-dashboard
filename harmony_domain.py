@@ -52,6 +52,7 @@ class HarmonyState:
     'current_chord' and 'notes_detected' both may be None.
     """
 
+    current_major_scale: Note | None
     current_chord: Chord | None
     notes_detected: list[Note] | None
 
