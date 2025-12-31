@@ -1,7 +1,11 @@
 from app import I_HarmonyAnalyzer, I_HarmonyStateListener
-from harmony_domain import NoteName, Note, ChordType, Chord, HarmonyState
+from harmony_domain import HarmonyState
 from chord_analyzer import ChordAnalyzer
-from tonal_center_detector import ScaleAnalyzer
+from tonal_center_detector import (
+    SlidingWindowTonalCenterDetector,
+    ConvolutionalTonalCenterDetector,
+)
+from enharmonic_resolver import EnharmonicResolver
 
 """
 NOTE: "Wrapped pitches" here refers to semitones from A, zero-indexed, wrapped between 0-11 incl.
@@ -17,7 +21,11 @@ class HarmonyModule(I_HarmonyAnalyzer):
     def __init__(self):
         self.listener = DummyListener()
         self.chord_analyzer = ChordAnalyzer()
-        self.scale_analyzer = ScaleAnalyzer()
+        self.convolutional_tonal_center_detector = ConvolutionalTonalCenterDetector()
+        self.sliding_window_tonal_center_detector = SlidingWindowTonalCenterDetector(
+            self.convolutional_tonal_center_detector
+        )
+        self.enharmonic_resolver = EnharmonicResolver()
 
     def register_listener(self, listener: I_HarmonyStateListener):
         self.listener = listener
@@ -28,22 +36,19 @@ class HarmonyModule(I_HarmonyAnalyzer):
         scale_agnostic_chord, unique_pitches_wrapped = (
             self.chord_analyzer.analyze_chord(pitches)
         )
-        chord_in_current_scale = None
+        tonal_center_wrapped_pitch = None
         if scale_agnostic_chord:
-            chord_in_current_scale = Chord(
-                root=self.scale_analyzer.map_wrapped_pitch_to_note(
-                    scale_agnostic_chord.root_wrapped_pitch
-                ),
-                chord_type=scale_agnostic_chord.chord_type,
+            self.sliding_window_tonal_center_detector.recalculate_tonal_center_given_new_chord(
+                scale_agnostic_chord
             )
-        notes_detected_in_current_scale = [
-            self.scale_analyzer.map_wrapped_pitch_to_note(wrapped_pitch)
-            for wrapped_pitch in unique_pitches_wrapped
-        ]
+        tonal_center_wrapped_pitch = (
+            self.sliding_window_tonal_center_detector.current_tonal_center
+        )
+
         self.listener.update_harmony_state(
-            HarmonyState(
-                current_major_scale=None,
-                current_chord=chord_in_current_scale,
-                notes_detected=notes_detected_in_current_scale,
+            self.enharmonic_resolver.convert_from_wrapped_pitches_to_notes(
+                new_tonal_center_wrapped_pitch=tonal_center_wrapped_pitch,
+                new_chord=scale_agnostic_chord,
+                detected_notes_wrapped_pitches=unique_pitches_wrapped,
             )
         )
