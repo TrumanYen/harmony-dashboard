@@ -1,5 +1,4 @@
-from app import App, I_HarmonyPresenter
-from harmony_domain import HarmonyState, Note
+from app import App
 from real_time_basic_pitch import PitchDetectingAudioStreamer
 from harmony_module import HarmonyModule
 from ui import TkinterAdapter
