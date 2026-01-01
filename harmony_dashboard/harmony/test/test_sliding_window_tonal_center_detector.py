@@ -11,7 +11,7 @@ from ..tonal_center_detector import (
 
 
 class TestSlidingWindowTonalCenterDetector:
-    EXPECTED_SLIDING_WINDOW_SIZE = 10
+    EXPECTED_SLIDING_WINDOW_SIZE = 8
 
     @pytest.fixture(autouse=True)
     def before_each_test(self):
@@ -71,3 +71,17 @@ class TestSlidingWindowTonalCenterDetector:
         self.patient.recalculate_tonal_center_given_new_chord(arbitrary_chord)
 
         assert self.patient.current_tonal_center == expected_tonal_center
+
+    def test_will_not_override_valid_prediction_with_an_invalid_prediction(self):
+        original_valid_tonal_center = random.randint(0, 11)
+        arbitrary_chord = ScaleAgnosticChord(0, ChordType.MAJOR)
+        self.convolutional_tonal_center_detector.predict_tonal_center.return_value = (
+            original_valid_tonal_center
+        )
+        different_arbitrary_chord = ScaleAgnosticChord(0, ChordType.MINOR)
+        self.patient.recalculate_tonal_center_given_new_chord(different_arbitrary_chord)
+        self.convolutional_tonal_center_detector.predict_tonal_center.return_value = (
+            None
+        )
+        self.patient.recalculate_tonal_center_given_new_chord(arbitrary_chord)
+        assert self.patient.current_tonal_center == original_valid_tonal_center

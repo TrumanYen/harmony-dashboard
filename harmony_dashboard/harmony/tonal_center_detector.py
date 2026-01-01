@@ -8,6 +8,8 @@ from ..harmony_domain import (
     ScaleAgnosticChord,
 )
 
+SLIDING_WINDOW_SIZE = 8
+
 
 class I_ConvolutionalTonalCenterDetector(ABC):
     @abstractmethod
@@ -32,7 +34,6 @@ class SlidingWindowTonalCenterDetector:
     def __init__(
         self, convolutional_scale_detector: I_ConvolutionalTonalCenterDetector
     ):
-        self.SLIDING_WINDOW_SIZE = 10
         self.convolutional_scale_detector = convolutional_scale_detector
         self.fifo_chord_window = deque()
         self.current_tonal_center = None
@@ -43,13 +44,15 @@ class SlidingWindowTonalCenterDetector:
             return
         self.fifo_chord_window.append(chord)
         self.convolutional_scale_detector.insert_chord(chord)
-        if len(self.fifo_chord_window) > self.SLIDING_WINDOW_SIZE:
+        if len(self.fifo_chord_window) > SLIDING_WINDOW_SIZE:
             oldest_chord = self.fifo_chord_window.popleft()
             self.convolutional_scale_detector.remove_chord(oldest_chord)
 
-        self.current_tonal_center = (
+        predicted_tonal_center = (
             self.convolutional_scale_detector.predict_tonal_center()
         )
+        if predicted_tonal_center is not None:
+            self.current_tonal_center = predicted_tonal_center
 
 
 class ConvolutionalTonalCenterDetector(I_ConvolutionalTonalCenterDetector):
@@ -116,9 +119,14 @@ class ConvolutionalTonalCenterDetector(I_ConvolutionalTonalCenterDetector):
             0, current_value_at_index - 1
         )
 
-    def predict_tonal_center(self):
+    def predict_tonal_center(self) -> int | None:
         prediction_vector = np.sum(self.kernels_3d * self.input_chord_data, axis=(1, 2))
-        # predicted_tonal_center = np.argmax(prediction_vector)
-        # score_for_prediction = prediction_vector[predicted_tonal_center]
-        # highest_possible_score = np.sum(self.input_chord_data, axis=(0, 1))
-        return np.argmax(prediction_vector)
+        predicted_tonal_center = np.argmax(prediction_vector)
+        score_for_prediction = prediction_vector[predicted_tonal_center]
+        tie_detected = len(np.argwhere(prediction_vector == score_for_prediction)) > 1
+
+        if score_for_prediction >= SLIDING_WINDOW_SIZE and not tie_detected:
+            # Must be the only choice with a perfect score
+            return predicted_tonal_center
+        else:
+            return None

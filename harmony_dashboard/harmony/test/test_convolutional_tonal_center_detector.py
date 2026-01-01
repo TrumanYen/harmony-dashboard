@@ -50,6 +50,10 @@ class TestConvolutionalTonalCenterDetector:
     # Helpers
     def very_obviously_c_major_progression(self):
         return [
+            ScaleAgnosticChord(root_wrapped_pitch=3, chord_type=ChordType.MAJOR),  # C
+            ScaleAgnosticChord(root_wrapped_pitch=10, chord_type=ChordType.MAJOR),  # G
+            ScaleAgnosticChord(root_wrapped_pitch=3, chord_type=ChordType.MAJOR),  # C
+            ScaleAgnosticChord(root_wrapped_pitch=8, chord_type=ChordType.MAJOR),  # F
             ScaleAgnosticChord(
                 root_wrapped_pitch=2, chord_type=ChordType.DIM_SEVENTH
             ),  # B dim7
@@ -70,6 +74,8 @@ class TestConvolutionalTonalCenterDetector:
 
     def very_obviously_d_major_progression(self):
         return [
+            ScaleAgnosticChord(root_wrapped_pitch=5, chord_type=ChordType.MAJOR),  # D
+            ScaleAgnosticChord(root_wrapped_pitch=10, chord_type=ChordType.MAJOR),  # G
             ScaleAgnosticChord(
                 root_wrapped_pitch=4, chord_type=ChordType.DIM_SEVENTH
             ),  # C# dim7
