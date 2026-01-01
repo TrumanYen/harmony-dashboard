@@ -51,6 +51,7 @@ A matching algorithm detects chords based on notes detected by `basic-pitch`.  T
 The following chord types are currently supported:
 - Major
 - 7th
+- Major 7th
 - Minor
 - Minor 7th
 - Diminished
@@ -118,12 +119,13 @@ Each type of chord (e.g. major, minor, diminished) can be represented as a rotat
 
 ||0|1|2|3|4|5|6|7|8|9|10|11|
 |--|--|--|--|--|--|--|--|--|--|--|--|--|
-|maj|1|0|0|0|1|0|0|1|0|0|0|0|
-|7|1|0|0|0|1|0|0|1|0|0|1|0|
-|min|1|0|0|1|0|0|0|1|0|0|0|0|
-|min7|1|0|0|1|0|0|0|1|0|0|1|0|
-|dim|1|0|0|1|0|0|1|0|0|0|0|0|
-|dim7|1|0|0|1|0|0|1|0|0|1|0|0
+|maj|3|0|0|0|1|0|0|2|0|0|0|0|
+|7|3|0|0|0|1|0|0|2|0|0|1|0|
+|maj 7|3|0|0|0|1|0|0|2|0|0|1|0|
+|min|3|0|0|1|0|0|0|2|0|0|0|0|
+|min7|3|0|0|1|0|0|0|2|0|0|1|0|
+|dim|3|0|0|1|0|0|2|0|0|0|0|0|
+|dim7|3|0|0|1|0|0|2|0|0|1|0|0
 
 Convolving this over our input in 2 dimensions gives us the following output matrix where the row and column of cell  with the highest value indicate the predicted chord type and root note, respectively:
 
@@ -131,6 +133,7 @@ Convolving this over our input in 2 dimensions gives us the following output mat
 |--|--|--|--|--|--|--|--|--|--|--|--|--|
 |maj|..|..|..|..|..|..|..|..|..|..|..|..|
 |7|..|..|..|..|..|..|..|..|..|..|..|..|
+|maj 7|..|..|..|..|..|..|..|..|..|..|..|..|
 |min|..|..|..|..|..|..|..|..|..|..|..|..|
 |min7|..|..|..|..|..|..|..|..|..|..|..|..|
 |dim|..|..|..|..|..|..|..|..|..|..|..|..|
