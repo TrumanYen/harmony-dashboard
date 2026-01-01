@@ -77,13 +77,14 @@ This app has been effective when tested under the following conditions:
 
 ### Data Flow
 At a high level, the app samples audio from a stream at a certain frequency.  For each sample, the following occurs:
-1. `basic-pitch` detects midi-pitches.
-2. The Chord Analyzer uses a matching algorithm to infer the chord-type and the root note of the chord (as a midi pitch) based on those pitches.
-3. The Tonal Center Detector keeps a sliding window of chords over time, then applies a convolutional filter over that window of chords to guess the pitch of the tonal center (similar to object detection, but in pitch space rather than pixel space).
-4. The Enharmonic Resolver selects the major scale for the tonal center with the least sharps and flats
-5. The Enharmonic Resolver then attempts to assign the most appropriate chord name for the current chord such that it fits within the current major scale.  In the event of key modulation, it will select the enharmonic equivalent for the chord that will result in minimal movement on the circle of fifths.
-6. Finally, the Enharmonic Resolver applies the key signature to the individual notes detected.  For notes that do not fit within the current scale, it will attempt to assign the most appropriate note names based on the current chord.  (e.g. "A flat" does not appear in the key of C major, but if it is detected as part of an "F minor" chord, the Enharmonic Resolver will know to refer to it as "A flat" rather than "G sharp")
-7. The results are displayed on the GUI
+1. Since `basic-pitch` does not have a real-time api, we must sample audio and feed it to `basic-pitch` in small chunks.
+2. `basic-pitch` detects midi-pitches.
+3. The Chord Analyzer uses a matching algorithm to infer the chord-type and the root note of the chord (as a midi pitch) based on those pitches.
+4. The Tonal Center Detector keeps a sliding window of chords over time, then applies a convolutional filter over that window of chords to guess the pitch of the tonal center (similar to object detection, but in pitch space rather than pixel space).
+5. The Enharmonic Resolver selects the major scale for the tonal center with the least sharps and flats
+6. The Enharmonic Resolver then attempts to assign the most appropriate chord name for the current chord such that it fits within the current major scale.  In the event of key modulation, it will select the enharmonic equivalent for the chord that will result in minimal movement on the circle of fifths.
+7. Finally, the Enharmonic Resolver applies the key signature to the individual notes detected.  For notes that do not fit within the current scale, it will attempt to assign the most appropriate note names based on the current chord.  (e.g. "A flat" does not appear in the key of C major, but if it is detected as part of an "F minor" chord, the Enharmonic Resolver will know to refer to it as "A flat" rather than "G sharp")
+8. The results are displayed on the GUI
 ```mermaid
 flowchart TD;
     microphone --"audio"-->audio_sampler
@@ -128,12 +129,12 @@ Convolving this over our input in 2 dimensions gives us the following output mat
 
 ||A|A#|B|C|C#|D|D#|E|F|F#|G|G#|
 |--|--|--|--|--|--|--|--|--|--|--|--|--|
-|dim7|..|..|..|..|..|..|..|..|..|..|..|..
-|dim|..|..|..|..|..|..|..|..|..|..|..|..
-|min7|..|..|..|..|..|..|..|..|..|..|..|..
-|min|..|..|..|..|..|..|..|..|..|..|..|..
-|7|..|..|..|..|..|..|..|..|..|..|..|..
-|maj|..|..|..|..|..|..|..|..|..|..|..|..
+|dim7|..|..|..|..|..|..|..|..|..|..|..|..|
+|dim|..|..|..|..|..|..|..|..|..|..|..|..|
+|min7|..|..|..|..|..|..|..|..|..|..|..|..|
+|min|..|..|..|..|..|..|..|..|..|..|..|..|
+|7|..|..|..|..|..|..|..|..|..|..|..|..|
+|maj|..|..|..|..|..|..|..|..|..|..|..|..|
 
 #### Tonal Center Detection
 After identifying a few chords, we can begin tallying the number of chords detected recently in the following table:
@@ -145,7 +146,7 @@ After identifying a few chords, we can begin tallying the number of chords detec
 
 This table forms the input for tonal center detection. Each tonal center has a group of "correct chords".  For example, the pitch at the tonal center (tonic) should form the root note of a major chord.  The pitch one semitone above the tonal center should not be used, and the pitch two semitones above the tonal center (suptertonic) should form a minor chord etc etc.  This pattern of "correct" chords can be represented as a kernel where the x axis is the number of pitches above the tonal center, and the y axis is the chord type:
 
-||A|A#|B|C|C#|D|D#|E|F|F#|G|G#|
+||0|1|2|3|4|5|6|7|8|9|10|11|
 |--|--|--|--|--|--|--|--|--|--|--|--|--|
 |dim/dim7|-1|-1|1|-1|-1|1|-1|-1|1|-1|-1|1|
 |min/min7|-1|-1|1|-1|1|0|-1|0|-1|1|-1|0|
