@@ -109,6 +109,17 @@ class TestChordAnalyzer:
             root_wrapped_pitch=0, chord_type=ChordType.SEVENTH
         )
 
+        # MAJ SEVENTH CHORD
+        g_maj_seventh_pitches = [
+            pitch_at_random_octave("G"),
+            pitch_at_random_octave("B"),
+            pitch_at_random_octave("D"),
+            pitch_at_random_octave("F#"),
+        ]
+        g_maj_seventh_chord = ScaleAgnosticChord(
+            root_wrapped_pitch=10, chord_type=ChordType.MAJ_SEVENTH
+        )
+
         # MIN SEVENTH CHORD
         d_min_seventh_pitches = [
             pitch_at_random_octave("D"),
@@ -146,6 +157,7 @@ class TestChordAnalyzer:
         return [
             pytest.param(f_minor_pitches, f_minor_chord),
             pytest.param(a_dom_seventh_pitches, a_dom_seventh_chord),
+            pytest.param(g_maj_seventh_pitches, g_maj_seventh_chord),
             pytest.param(d_min_seventh_pitches, d_min_seventh_chord),
             pytest.param(b_dim_pitches, b_dim_chord),
             pytest.param(c_sharp_dim_seventh_pitches, c_sharp_dim_seventh_chord),
