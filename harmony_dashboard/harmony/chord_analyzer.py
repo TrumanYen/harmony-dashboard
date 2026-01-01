@@ -1,4 +1,4 @@
-from typing import NamedTuple
+from collections import deque
 
 import numpy as np
 
@@ -40,6 +40,8 @@ class ChordAnalyzer:
         self.kernels_3d = np.stack(
             [np.roll(KERNEL_TEMPLATE, shift=i, axis=1) for i in range(12)]
         )
+        self.historical_scores_queue = deque()
+        self.historical_scores_sliding_window_size = 10
 
     def analyze_chord(self, pitches: list[int]):
         # midi pitch number 9 is an "A"
@@ -57,10 +59,17 @@ class ChordAnalyzer:
         prediction_array = np.sum(self.kernels_3d * octave_array_repeated, axis=2)
         flattened_index = np.argmax(prediction_array)
         highest_value = prediction_array.flat[flattened_index]
+        score_is_better_than_recent_scores = (
+            not self.historical_scores_queue
+            or highest_value >= max(self.historical_scores_queue)
+        )
+        use_answer = highest_value > 5 or score_is_better_than_recent_scores
+        self._store_score_in_queue(highest_value)
+
         winning_coordinate_pairs = np.argwhere(prediction_array == highest_value)
         number_winners = len(winning_coordinate_pairs)
-        if number_winners == 0:
-            # Shouldn't happen but just in case
+        if (not use_answer) or number_winners == 0:
+            # Second case shouldn't happen but just in case
             return None, unique_pitches_wrapped
         # By default choose the first one
         root_pitch = winning_coordinate_pairs[0][0]
@@ -80,3 +89,11 @@ class ChordAnalyzer:
             chord_type=self.chord_types_by_row_index[chord_index],
         )
         return chord, unique_pitches_wrapped
+
+    def _store_score_in_queue(self, score: int):
+        self.historical_scores_queue.append(score)
+        if (
+            len(self.historical_scores_queue)
+            > self.historical_scores_sliding_window_size
+        ):
+            self.historical_scores_queue.popleft()
