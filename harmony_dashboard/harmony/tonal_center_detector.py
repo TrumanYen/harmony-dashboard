@@ -68,12 +68,12 @@ class ConvolutionalTonalCenterDetector(I_ConvolutionalTonalCenterDetector):
     def __init__(self):
         self.chord_type_to_row_num_map = {
             ChordType.MAJOR: 0,
-            ChordType.SEVENTH: 0,
-            ChordType.MAJ_SEVENTH: 0,  # TODO: this is wrong but we'll leave it for now
-            ChordType.MINOR: 1,
-            ChordType.MIN_SEVENTH: 1,
-            ChordType.DIMINISHED: 2,
-            ChordType.DIM_SEVENTH: 2,
+            ChordType.SEVENTH: 1,
+            ChordType.MAJ_SEVENTH: 2,
+            ChordType.MINOR: 3,
+            ChordType.MIN_SEVENTH: 3,
+            ChordType.DIMINISHED: 4,
+            ChordType.DIM_SEVENTH: 4,
         }
         # Rows indices represent chord type, column indices represent chord roots in incrementing by
         # semitone starting at A=0.  These values are populated by my personal experience as a classical
@@ -81,20 +81,27 @@ class ConvolutionalTonalCenterDetector(I_ConvolutionalTonalCenterDetector):
         # and it learned to obey me.
         KERNEL_TEMPLATE_A_MAJOR = np.array(
             [
-                [1, -1, 0, -1, 1, 1, -1, 1, -1, 0, -1, 0],  # maj
-                [-1, -1, 1, -1, 1, 0, -1, 0, -1, 1, -1, 0],  # min
-                [-1, -1, 1, -1, -1, 1, -1, -1, 1, -1, -1, 1],  # dim
+                [1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0],  # maj
+                [0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0],  # seventh
+                [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],  # maj seventh
+                [0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0],  # min
+                [0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1],  # dim
             ]
         )
         # Circular convolution, each time shifting the kernel to the right.  Each shifted version
         # of the kernel gets stacked, such that we now have 12x kernels, each representing one
         # tonal center.
         self.kernels_3d = np.stack(
-            [np.roll(KERNEL_TEMPLATE_A_MAJOR, shift=i, axis=1) for i in range(12)],
+            [
+                np.roll(KERNEL_TEMPLATE_A_MAJOR, shift=i, axis=1)
+                for i in range(KERNEL_TEMPLATE_A_MAJOR.shape[1])
+            ],
             axis=0,
         )
         # This is the array that will get modified as chords are inserted and removed:
-        self.input_chord_data = np.zeros(shape=(3, 12), dtype=np.int8)
+        self.input_chord_data = np.zeros(
+            shape=KERNEL_TEMPLATE_A_MAJOR.shape, dtype=np.int8
+        )
 
     def insert_chord(self, chord: ScaleAgnosticChord):
         row_num = self.chord_type_to_row_num_map[chord.chord_type]
@@ -111,6 +118,7 @@ class ConvolutionalTonalCenterDetector(I_ConvolutionalTonalCenterDetector):
 
     def predict_tonal_center(self):
         prediction_vector = np.sum(self.kernels_3d * self.input_chord_data, axis=(1, 2))
-        if not np.any(prediction_vector):
-            return None
+        # predicted_tonal_center = np.argmax(prediction_vector)
+        # score_for_prediction = prediction_vector[predicted_tonal_center]
+        # highest_possible_score = np.sum(self.input_chord_data, axis=(0, 1))
         return np.argmax(prediction_vector)
