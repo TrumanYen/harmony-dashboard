@@ -76,7 +76,9 @@ class PitchDetectingAudioStreamer(I_PitchStreamer):
                 # Print out detected notes
                 if len(midi_data.instruments) > 0:
                     instrument = midi_data.instruments[0]
-                    pitches = [note.pitch for note in instrument.notes]
+                    pitches = [
+                        note.pitch for note in instrument.notes if note.velocity > 50
+                    ]
                     self.listener.new_pitches_detected(pitches)
             time.sleep(self.pitch_detection_sample_period_sec)
 
