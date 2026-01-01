@@ -26,7 +26,7 @@ class Note:
 
 class ChordType(Enum):
     """
-    There are only 6 actual chords, the rest are mental disorders.
+    There are only 7 actual chords, the rest are mental disorders.
     """
 
     MAJOR = auto()
@@ -34,6 +34,7 @@ class ChordType(Enum):
     DIMINISHED = auto()
     SEVENTH = auto()
     MIN_SEVENTH = auto()
+    MAJ_SEVENTH = auto()
     DIM_SEVENTH = auto()
 
 

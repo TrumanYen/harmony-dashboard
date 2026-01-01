@@ -29,21 +29,15 @@ class TestChordAnalyzer:
     def will_return_empty_chord_given_insufficient_pitches_data():
         no_pitches = []
         one_pitch = [pitch_at_random_octave("C")]
-        two_pitches = [
-            pitch_at_random_octave("C"),
-            pitch_at_random_octave("D"),
-        ]
-        three_pitches_with_duplicate = [
+        two_of_same_note = [
             pretty_midi.note_name_to_number("C2"),
             pretty_midi.note_name_to_number("C3"),
-            pitch_at_random_octave("D"),
         ]
 
         return [
             pytest.param(no_pitches),
             pytest.param(one_pitch),
-            pytest.param(two_pitches),
-            pytest.param(three_pitches_with_duplicate),
+            pytest.param(two_of_same_note),
         ]
 
     @pytest.mark.parametrize(

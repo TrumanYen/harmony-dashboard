@@ -128,6 +128,7 @@ class Formatter:
             ChordType.SEVENTH: "⁷",
             ChordType.MINOR: "m",
             ChordType.MIN_SEVENTH: "m⁷",
+            ChordType.MAJ_SEVENTH: "∆",
             ChordType.DIMINISHED: "°",
             ChordType.DIM_SEVENTH: "°⁷",
         }
