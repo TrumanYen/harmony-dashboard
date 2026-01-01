@@ -118,39 +118,39 @@ Each type of chord (e.g. major, minor, diminished) can be represented as a rotat
 
 ||0|1|2|3|4|5|6|7|8|9|10|11|
 |--|--|--|--|--|--|--|--|--|--|--|--|--|
-|dim7|1|0|0|1|0|0|1|0|0|1|0|0
-|dim|1|0|0|1|0|0|1|0|0|0|0|0|
-|min7|1|0|0|1|0|0|0|1|0|0|1|0|
-|min|1|0|0|1|0|0|0|1|0|0|0|0|
-|7|1|0|0|0|1|0|0|1|0|0|1|0|
 |maj|1|0|0|0|1|0|0|1|0|0|0|0|
+|7|1|0|0|0|1|0|0|1|0|0|1|0|
+|min|1|0|0|1|0|0|0|1|0|0|0|0|
+|min7|1|0|0|1|0|0|0|1|0|0|1|0|
+|dim|1|0|0|1|0|0|1|0|0|0|0|0|
+|dim7|1|0|0|1|0|0|1|0|0|1|0|0
 
 Convolving this over our input in 2 dimensions gives us the following output matrix where the row and column of cell  with the highest value indicate the predicted chord type and root note, respectively:
 
 ||A|A#|B|C|C#|D|D#|E|F|F#|G|G#|
 |--|--|--|--|--|--|--|--|--|--|--|--|--|
-|dim7|..|..|..|..|..|..|..|..|..|..|..|..|
-|dim|..|..|..|..|..|..|..|..|..|..|..|..|
-|min7|..|..|..|..|..|..|..|..|..|..|..|..|
-|min|..|..|..|..|..|..|..|..|..|..|..|..|
-|7|..|..|..|..|..|..|..|..|..|..|..|..|
 |maj|..|..|..|..|..|..|..|..|..|..|..|..|
+|7|..|..|..|..|..|..|..|..|..|..|..|..|
+|min|..|..|..|..|..|..|..|..|..|..|..|..|
+|min7|..|..|..|..|..|..|..|..|..|..|..|..|
+|dim|..|..|..|..|..|..|..|..|..|..|..|..|
+|dim7|..|..|..|..|..|..|..|..|..|..|..|..|
 
 #### Tonal Center Detection
 After identifying a few chords, we can begin tallying the number of chords detected recently in the following table:
 ||A|A#|B|C|C#|D|D#|E|F|F#|G|G#|
 |--|--|--|--|--|--|--|--|--|--|--|--|--|
-|dim/dim7|..|..|..|..|..|..|..|..|..|..|..|..|
-|min/min7|..|..|..|..|..|..|..|..|..|..|..|..|
 |maj/7|..|..|..|..|..|..|..|..|..|..|..|..|
+|min/min7|..|..|..|..|..|..|..|..|..|..|..|..|
+|dim/dim7|..|..|..|..|..|..|..|..|..|..|..|..|
 
 This table forms the input for tonal center detection. Each tonal center has a group of "correct chords".  For example, the pitch at the tonal center (tonic) should form the root note of a major chord.  The pitch one semitone above the tonal center should not be used, and the pitch two semitones above the tonal center (suptertonic) should form a minor chord etc etc.  This pattern of "correct" chords can be represented as a kernel where the x axis is the number of pitches above the tonal center, and the y axis is the chord type:
 
 ||0|1|2|3|4|5|6|7|8|9|10|11|
 |--|--|--|--|--|--|--|--|--|--|--|--|--|
-|dim/dim7|-1|-1|1|-1|-1|1|-1|-1|1|-1|-1|1|
-|min/min7|-1|-1|1|-1|1|0|-1|0|-1|1|-1|0|
 |maj/7|1|-1|0|-1|1|1|-1|1|-1|0|-1|0|
+|min/min7|-1|-1|1|-1|1|0|-1|0|-1|1|-1|0|
+|dim/dim7|-1|-1|1|-1|-1|1|-1|-1|1|-1|-1|1|
 
 Convolving this kernel over our input matrix from left to right gives us a 1D output vector where the column of the highest value indicates the most likely tonal center:
 
