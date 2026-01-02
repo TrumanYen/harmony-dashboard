@@ -165,3 +165,20 @@ Convolving this kernel over our input matrix from left to right gives us a 1D ou
 |A|A#|B|C|C#|D|D#|E|F|F#|G|G#|
 |--|--|--|--|--|--|--|--|--|--|--|--|
 |..|..|..|..|..|..|..|..|..|..|..|..|
+
+### Reference Frames & Conventions
+Pitches are represented in four different reference frames in this project.
+
+#### MIDI Note Numbers
+`basic-pitch` outputs pitches in MIDI format.  These pitches are in units of semitones and start at a very low C# such that middle C = 60.
+#### Wrapped Pitches
+Since we care more about the note's position in the octave than the octave it is found in, we convert MIDI note numbers to what is referred to in the code as "wrapped pitches". These are also in units of semitones but start at `A` (0) and end at `G#` (11), regardless of the octave.  This convention allows us to do most of the math we need here.
+
+To convert from MIDI note numbers to wrapped pitches, subtract 9 from the MIDI note and modulo by 12.
+#### Circle Indices
+Circle indices are another convention that was made up for this project.  They refer to positions of notes on the circle of fifths, starting at `C` = 0.  This is allows us to determine which sharps and flats to use in a given key and chord.  They do not map to specific octaves on the keyboard; rather, each circle index maps directly to a unique note name (e.g. circle index 14 maps to `C double sharp`, while circle index -10 maps to `E double flat`.  They both refer to the same wrapped pitch but are very far apart in the circle of fifths because they are associated with very different key signatures).
+
+Each wrapped pitch maps to an infinite number of possible circle indices.  If we were to convert two wrapped pitches `x` and `y` into circle indices `x1` and `y1` respectively, the smallest possible value of `y1-x1` would equal `7*(y-x) %12`.  Therefore, to convert wrapped pitch `z` into circle index `z1`, use the following: `z1 = 7*(z-3) %12`.  To convert a circle index `a1` back into a wrapped pitch `a`, use: `a = (7*a1 + 3) %12`.
+
+#### English Note Names
+Musicians refer to notes in terms of note names, not pitch numbers.  Converting from a circle index to the correct note name is in concept as simple as counting clockwise around the circle of fifths for positive circle indices, or counter-clockwise for negative circle indices (starting at `C` in both cases).
