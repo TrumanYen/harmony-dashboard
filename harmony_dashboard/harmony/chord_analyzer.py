@@ -27,13 +27,13 @@ class ChordAnalyzer:
         # Root note gets 3 points, fifth gets 2 points, third and sevenths get 1 each
         KERNEL_TEMPLATE = np.array(
             [
-                [3, 0, 0, 0, 1, 0, 0, 2, 0, 0, 0, 0],  # Major
-                [3, 0, 0, 0, 1, 0, 0, 2, 0, 0, 1, 0],  # Seventh
-                [3, 0, 0, 0, 1, 0, 0, 2, 0, 0, 0, 1],  # Maj Seventh
-                [3, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 0],  # Minor
-                [3, 0, 0, 1, 0, 0, 0, 2, 0, 0, 1, 0],  # Min Seventh
-                [3, 0, 0, 1, 0, 0, 2, 0, 0, 0, 0, 0],  # Diminished
-                [3, 0, 0, 1, 0, 0, 2, 0, 0, 1, 0, 0],  # Diminished Seventh
+                [3, 0, 0, 0, 2, 0, 0, 2, 0, 0, 0, 0],  # Major
+                [3, 0, 0, 0, 2, 0, 0, 2, 0, 0, 1, 0],  # Seventh
+                [3, 0, 0, 0, 2, 0, 0, 2, 0, 0, 0, 1],  # Maj Seventh
+                [3, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0],  # Minor
+                [3, 0, 0, 2, 0, 0, 0, 2, 0, 0, 1, 0],  # Min Seventh
+                [3, 0, 0, 2, 0, 0, 2, 0, 0, 0, 0, 0],  # Diminished
+                [3, 0, 0, 2, 0, 0, 2, 0, 0, 1, 0, 0],  # Diminished Seventh
             ]
         )
         # Circular convolution along the pitch axis (columns)
