@@ -125,7 +125,7 @@ Each type of chord (e.g. major, minor, diminished) can be represented as a rotat
 |min|3|0|0|2|0|0|0|2|0|0|0|0|
 |min7|3|0|0|2|0|0|0|2|0|0|1|0|
 |dim|3|0|0|2|0|0|2|0|0|0|0|0|
-|dim7|3|0|0|2|0|0|2|0|0|1|0|0
+|dim7|3|0|0|2|0|0|2|0|0|1|0|0|
 
 Convolving this over our input in 2 dimensions gives us the following output matrix where the row and column of cell  with the highest value indicate the predicted chord type and root note, respectively:
 
