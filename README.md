@@ -110,14 +110,14 @@ In music theory, pitch ascends in a repeating pattern with a period of 12 semito
 
 Every pitch detected in a sample can be marked as `1` on this circle (and pitches not detected left as `0`).  When flattened, it forms the following input vector:
 
-A|A#|B|C|C#|D|D#|E|F|F#|G|G#|
+|A|A#|B|C|C#|D|D#|E|F|F#|G|G#|
 |--|--|--|--|--|--|--|--|--|--|--|--|
 |...|...|...|...|...|...|...|...|...|...|...|...|
 
 Each type of chord (e.g. major, minor, diminished) can be represented as a rotation-invariant pattern of intervals laid out on this circle.  For example, a major triad is a note at any arbitrary pitch followed by a second note 4 semitones above it, then a third note 3 semitones above that.  This pattern forms the "kernel" for the major chord that can be convolved around the circular octave.  The following matrix represents a the kernels for various chord types stacked vertically.  The x-axis represents semitones above the chord root, and the y axis represents the chord type:
 
 
-||0|1|2|3|4|5|6|7|8|9|10|11|
+| |0|1|2|3|4|5|6|7|8|9|10|11|
 |--|--|--|--|--|--|--|--|--|--|--|--|--|
 |maj|3|0|0|0|2|0|0|2|0|0|0|0|
 |7|3|0|0|0|2|0|0|2|0|0|1|0|
@@ -129,7 +129,7 @@ Each type of chord (e.g. major, minor, diminished) can be represented as a rotat
 
 Convolving this over our input in 2 dimensions gives us the following output matrix where the row and column of cell  with the highest value indicate the predicted chord type and root note, respectively:
 
-||A|A#|B|C|C#|D|D#|E|F|F#|G|G#|
+| |A|A#|B|C|C#|D|D#|E|F|F#|G|G#|
 |--|--|--|--|--|--|--|--|--|--|--|--|--|
 |maj|..|..|..|..|..|..|..|..|..|..|..|..|
 |7|..|..|..|..|..|..|..|..|..|..|..|..|
@@ -141,7 +141,7 @@ Convolving this over our input in 2 dimensions gives us the following output mat
 
 #### Tonal Center Detection
 After identifying a few chords, we can begin tallying the number of chords detected recently in the following table:
-||A|A#|B|C|C#|D|D#|E|F|F#|G|G#|
+| |A|A#|B|C|C#|D|D#|E|F|F#|G|G#|
 |--|--|--|--|--|--|--|--|--|--|--|--|--|
 |maj|..|..|..|..|..|..|..|..|..|..|..|..|
 |7|..|..|..|..|..|..|..|..|..|..|..|..|
@@ -151,7 +151,7 @@ After identifying a few chords, we can begin tallying the number of chords detec
 
 This table forms the input for tonal center detection. Each tonal center has a group of "correct chords".  For example, the pitch at the tonal center (tonic) should form the root note of a major chord.  The pitch one semitone above the tonal center should not be used, and the pitch two semitones above the tonal center (suptertonic) should form a minor chord etc etc.  This pattern of "correct" chords can be represented as a kernel where the x axis is the number of pitches above the tonal center, and the y axis is the chord type:
 
-||0|1|2|3|4|5|6|7|8|9|10|11|
+| |0|1|2|3|4|5|6|7|8|9|10|11|
 |--|--|--|--|--|--|--|--|--|--|--|--|--|
 |maj|1|0|0|0|1|1|0|1|0|0|0|0|
 |7|0|0|0|0|1|0|0|1|0|0|0|0|
