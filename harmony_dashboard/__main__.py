@@ -1,11 +1,15 @@
 from .app import App
+from .physical_mic_integration import PhysicalMicIntegration
 from .real_time_basic_pitch import PitchDetectingAudioStreamer
 from .harmony import HarmonyModule
 from .ui import TkinterAdapter
 
 
 if __name__ == "__main__":
-    pitch_detecting_audio_streamer = PitchDetectingAudioStreamer()
+    physical_mic_streamer = PhysicalMicIntegration()
+    pitch_detecting_audio_streamer = PitchDetectingAudioStreamer(
+        audio_streamer=physical_mic_streamer
+    )
     harmony_analyzer = HarmonyModule()
     presenter = TkinterAdapter()
 

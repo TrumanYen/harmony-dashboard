@@ -1,14 +1,13 @@
 import queue
+from abc import ABC, abstractmethod
 import threading
 import time
-import sys
-from typing import Any
+from typing import Callable
 
 from basic_pitch.inference import predict, Model
 from basic_pitch import ICASSP_2022_MODEL_PATH
 import numpy as np
 import soundfile as sf
-import sounddevice as sd
 
 from .app import I_PitchStreamer, I_PitchStreamListener
 
@@ -18,8 +17,21 @@ class DummyListener(I_PitchStreamListener):
         pass
 
 
+class I_AudioStreamer(ABC):
+    @abstractmethod
+    def stream_audio(
+        self,
+        sample_rate: int,
+        num_audio_channels: int,
+        callback: Callable[[np.ndarray], None],
+        threading_event: threading.Event,
+    ):
+        pass
+
+
 class PitchDetectingAudioStreamer(I_PitchStreamer):
-    def __init__(self):
+    def __init__(self, audio_streamer: I_AudioStreamer):
+        self.audio_streamer = audio_streamer
         self.listener = DummyListener()
         self.audio_block_queue = queue.Queue()
         self.thread_event = threading.Event()
@@ -83,24 +95,12 @@ class PitchDetectingAudioStreamer(I_PitchStreamer):
             time.sleep(self.pitch_detection_sample_period_sec)
 
     def _stream_audio(self):
-        try:
-            with sd.InputStream(
-                samplerate=self.sample_rate,
-                channels=self.audio_channels,
-                callback=self._enqueue_audio_block,
-            ):
-                # The 'with' statement manages the stream; it runs in the background.
-                # The main thread can do other things or simply wait.
-                self.thread_event.wait()
-        except KeyboardInterrupt:
-            print("\nStream killed by user.")
+        self.audio_streamer.stream_audio(
+            sample_rate=self.sample_rate,
+            num_audio_channels=self.audio_channels,
+            callback=self._enqueue_audio_block,
+            threading_event=self.thread_event,
+        )
 
-        except Exception as e:
-            print(f"An error occurred: {e}")
-
-    def _enqueue_audio_block(
-        self, indata: np.ndarray, frames: int, time: Any, status: sd.CallbackFlags
-    ):
-        if status:
-            print(f"Status flags: {status}", file=sys.stderr)
-        self.audio_block_queue.put(indata.copy())
+    def _enqueue_audio_block(self, audio_data: np.ndarray):
+        self.audio_block_queue.put(audio_data)
