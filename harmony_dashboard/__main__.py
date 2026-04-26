@@ -60,7 +60,7 @@ def parse_args():
     parser.add_argument(
         "-l",
         "--log_dir",
-        help="If a directory path is provided at this argument, the app write its outputs to a csv file in that directory",
+        help="If a directory path is provided at this argument, the app will write its outputs to a timestamped csv file within that directory",
         required=False,
         default=None,
     )
