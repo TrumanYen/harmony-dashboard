@@ -23,6 +23,8 @@ class FilePlaybackIntegration(I_AudioStreamer):
         MONO_CHANNELS = 1
         assert num_audio_channels == MONO_CHANNELS, "Only mono supported for playback!"
         try:
+            # This is fine for now but for larger audio files we will need to
+            # manage memory more responsibly
             audio_data, original_sample_rate = sf.read(self.file_path)
             resampled_audio = resampy.resample(
                 x=audio_data, sr_orig=original_sample_rate, sr_new=sample_rate
